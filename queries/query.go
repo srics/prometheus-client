@@ -15,7 +15,7 @@ const (
 	// irate, avg used to calculate node percentage of all nodes
 	// being monitored by node exporters which shall run as daemon sets
 	// all nodes.
-	cpu = "100%20-%20(avg%20by%20(instance)%20(irate(node_cpu_seconds_total{job=%22node-exporter%22,mode=%22idle%22}[5m]))%20*%20100)"
+	cpu = "100 - (avg by (instance) (irate(node_cpu_seconds_total{job='node-exporter',mode='idle'}[5m])) * 100)"
 
 	// % of memory using free, buffered and cached divided by total memory ranging over 5m
 	memory = "100 * (1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m])))"
@@ -24,8 +24,8 @@ const (
 // CPU function returns a response of type instance:value
 func CPU(url, username, password string) (values map[string]interface{}) {
 
-	// Construct URL
-	queryurl := url + query + "?" + "query=" + cpu
+	// Construct url
+	queryurl := url + query + "?" + "query=" + u.QueryEscape(cpu)
 
 	req, err := http.NewRequest("GET", queryurl, nil)
 	if err != nil {
