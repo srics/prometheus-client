@@ -16,13 +16,6 @@ func main() {
 	// write to mongo, sync between the two.
 	metric := make(chan map[string]interface{}, 100)
 
-	go query(metric, url, username, password)
+	go queries.QueryCPU(metric, url, username, password)
 
-}
-
-func query(c chan map[string]interface{}, url, username, password string) {
-	CPU := queries.CPU(url, username, password)
-	MEM := queries.Memory(url, username, password)
-	c <- CPU
-	c <- MEM
 }
