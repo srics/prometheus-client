@@ -49,3 +49,18 @@ func TestMEMNamespace(t *testing.T) {
 		t.Logf("Memory Usage Values \n: Namespace[%s] : Value[%s]", i, c)
 	}
 }
+
+func TestQueryCPU(t *testing.T) {
+	url := os.Getenv("PROMURL")
+	username := os.Getenv("USERNAME")
+	password := os.Getenv("PASSWORD")
+	metric := make(chan map[string]interface{}, 100)
+
+	go QueryCPU(metric, url, username, password)
+
+	m1 := <-metric
+	t.Logf("Metric Namespace CPU \n: %s", m1)
+
+	m2 := <-metric
+	t.Logf("Metric Node CPU \n: %s", m2)
+}
