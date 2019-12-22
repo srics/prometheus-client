@@ -7,10 +7,8 @@ import (
 
 func TestCPUNode(t *testing.T) {
 	url := os.Getenv("PROMURL")
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
 
-	values := CPUNode(url, username, password)
+	values := CPUNode(url)
 	for i, c := range values {
 		t.Logf("CPU Usage Values \n: Instance[%s] : Value[%s]", i, c)
 	}
@@ -19,10 +17,8 @@ func TestCPUNode(t *testing.T) {
 
 func TestMEMNode(t *testing.T) {
 	url := os.Getenv("PROMURL")
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
 
-	values := MEMNode(url, username, password)
+	values := MEMNode(url)
 	for i, c := range values {
 		t.Logf("Memory Usage Values \n: Instance[%s] : Value[%s]", i, c)
 	}
@@ -30,14 +26,13 @@ func TestMEMNode(t *testing.T) {
 
 func TestCPUNamespace(t *testing.T) {
 	url := os.Getenv("PROMURL")
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
+
 	// use any namespace as required, keep on populating
 	// this ns slice
 	ns := []string{"kube-system", "logging"}
 
 	for _, c := range ns {
-		values := CPUNamespace(url, username, password, c)
+		values := CPUNamespace(url, c)
 		t.Logf("CPU Usage Values \n: Namespace[%s] : Value[%s]", c, values)
 	}
 
@@ -45,26 +40,23 @@ func TestCPUNamespace(t *testing.T) {
 
 func TestMEMNamespace(t *testing.T) {
 	url := os.Getenv("PROMURL")
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
+
 	ns := []string{"kube-system", "logging"}
 
 	for _, c := range ns {
-		values := CPUNamespace(url, username, password, c)
+		values := CPUNamespace(url, c)
 		t.Logf("CPU Usage Values \n: Namespace[%s] : Value[%s]", c, values)
 	}
 }
 
 func TestQueryNamespace(t *testing.T) {
 	url := os.Getenv("PROMURL")
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
 
 	ns := []string{"kube-system", "logging"}
 
 	metric := make(chan map[string]interface{}, 100)
 	for _, c := range ns {
-		go QueryNamespace(metric, url, username, password, c)
+		go QueryNamespace(metric, url, c)
 		m1 := <-metric
 		t.Logf("Metric Namespace CPU \n: %s", m1)
 

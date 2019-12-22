@@ -18,21 +18,21 @@ const (
 )
 
 // CPUNode shall return CPU Metrics of a node
-func CPUNode(url, username, password string) (values map[string]interface{}) {
+func CPUNode(url string) (values map[string]interface{}) {
 	queryurl := url + path + "?" + "query=" + u.QueryEscape(cpuNode)
-	values = utils.HTTPGetReq(queryurl, username, password)
+	values = utils.HTTPGetReq(queryurl)
 	return values
 }
 
 // MEMNode shall return MEM Metrics of a node
-func MEMNode(url, username, password string) (values map[string]interface{}) {
+func MEMNode(url string) (values map[string]interface{}) {
 	queryurl := url + path + "?" + "query=" + u.QueryEscape(memoryNode)
-	values = utils.HTTPGetReq(queryurl, username, password)
+	values = utils.HTTPGetReq(queryurl)
 	return values
 }
 
 // CPUNamespace shall return the cpu consumption of the namespace
-func CPUNamespace(url, username, password string, namespace string) (values map[string]interface{}) {
+func CPUNamespace(url, namespace string) (values map[string]interface{}) {
 
 	// cpu consumption per namespace
 	// ORG QUERY: sum(rate(container_cpu_usage_seconds_total{image!='',namespace='logging'}[5m])) by (namespace)
@@ -41,12 +41,12 @@ func CPUNamespace(url, username, password string, namespace string) (values map[
 	q := "sum(rate(container_cpu_usage_seconds_total{image!='',"
 	escapeQ := q + "namespace='" + namespace + "'}[5m]))" + "by (namespace)"
 	queryurl := url + path + "?" + "query=" + u.QueryEscape(escapeQ)
-	values = utils.HTTPGetNamespaceReq(queryurl, username, password)
+	values = utils.HTTPGetNamespaceReq(queryurl)
 	return values
 }
 
 // MEMNamespace shall return the mem consumption of the namespace
-func MEMNamespace(url, username, password, namespace string) (values map[string]interface{}) {
+func MEMNamespace(url, namespace string) (values map[string]interface{}) {
 
 	// memory consumption per namespace
 	// ORG QUERY: sum(container_memory_working_set_bytes{namespace='logging'}) by (namespace)"
@@ -55,16 +55,16 @@ func MEMNamespace(url, username, password, namespace string) (values map[string]
 	escapeQ := q + "{namespace='" + namespace + "'})" + "by (namespace)"
 
 	queryurl := url + path + "?" + "query=" + u.QueryEscape(escapeQ)
-	values = utils.HTTPGetNamespaceReq(queryurl, username, password)
+	values = utils.HTTPGetNamespaceReq(queryurl)
 	return values
 }
 
 // QueryNamespace shall query cpu resource of nodes and namespaces, shall send this
 // CPU Channel. TODO: To write to data base use another go routine.
-func QueryNamespace(c chan map[string]interface{}, url, username, password, namespace string) {
+func QueryNamespace(c chan map[string]interface{}, url, namespace string) {
 
-	CPUNamespace := CPUNamespace(url, username, password, namespace)
-	MEMNamespace := MEMNamespace(url, username, password, namespace)
+	CPUNamespace := CPUNamespace(url, namespace)
+	MEMNamespace := MEMNamespace(url, namespace)
 	c <- CPUNamespace
 	c <- MEMNamespace
 }

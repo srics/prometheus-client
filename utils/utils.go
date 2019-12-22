@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"prometheus/models"
 )
 
@@ -14,14 +15,14 @@ var (
 )
 
 // HTTPGetReq function shall return instance:values
-func HTTPGetReq(url, username, password string) (values map[string]interface{}) {
+func HTTPGetReq(url string) (values map[string]interface{}) {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatalf("NewRequest construct error : %d", err)
 	}
 
-	req.SetBasicAuth(username, password)
+	req.SetBasicAuth(os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -56,14 +57,14 @@ func HTTPGetReq(url, username, password string) (values map[string]interface{}) 
 
 //HTTPGetNamespaceReq unmarshalling to Namespace struct
 // TODO: Break func till unmarshal
-func HTTPGetNamespaceReq(url, username, password string) (values map[string]interface{}) {
+func HTTPGetNamespaceReq(url string) (values map[string]interface{}) {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatalf("NewRequest construct error : %d", err)
 	}
 
-	req.SetBasicAuth(username, password)
+	req.SetBasicAuth(os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
