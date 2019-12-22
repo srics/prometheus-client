@@ -3,7 +3,6 @@ package queries
 import (
 	u "net/url"
 	"prometheus/utils"
-	//	"log"
 )
 
 const (
@@ -16,8 +15,6 @@ const (
 
 	// % of memory using free, buffered and cached divided by total memory ranging over 5m
 	memoryNode = "100 * (1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m])))"
-
-	cpuNamespace = "sum(rate(container_cpu_usage_seconds_total{image!='',namespace='logging'}[5m])) by (namespace)"
 )
 
 // CPUNode shall return CPU Metrics of a node
@@ -38,6 +35,9 @@ func MEMNode(url, username, password string) (values map[string]interface{}) {
 func CPUNamespace(url, username, password string, namespace string) (values map[string]interface{}) {
 
 	// cpu consumption per namespace
+	// ORG QUERY: sum(rate(container_cpu_usage_seconds_total{image!='',namespace='logging'}[5m])) by (namespace)
+	// Contruct URL to keep namespace dynamic
+
 	q := "sum(rate(container_cpu_usage_seconds_total{image!='',"
 	escapeQ := q + "namespace='" + namespace + "'}[5m]))" + "by (namespace)"
 	queryurl := url + path + "?" + "query=" + u.QueryEscape(escapeQ)
