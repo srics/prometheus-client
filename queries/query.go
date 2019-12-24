@@ -58,13 +58,3 @@ func MEMNamespace(url, namespace string) (values map[string]interface{}) {
 	values = utils.HTTPGetNamespaceReq(queryurl)
 	return values
 }
-
-// QueryNamespace shall query cpu resource of nodes and namespaces, shall send this
-// CPU Channel. TODO: To write to data base use another go routine.
-func QueryNamespace(c chan map[string]interface{}, url, namespace string) {
-
-	CPUNamespace := CPUNamespace(url, namespace)
-	MEMNamespace := MEMNamespace(url, namespace)
-	c <- CPUNamespace
-	c <- MEMNamespace
-}
