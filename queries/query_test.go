@@ -41,7 +41,7 @@ func TestCPUNamespace(t *testing.T) {
 func TestMEMNamespace(t *testing.T) {
 	url := os.Getenv("PROMURL")
 
-	ns := []string{"kube-system", "logging"}
+	ns := []string{"kube-system", "cnox"}
 
 	for _, c := range ns {
 		values := CPUNamespace(url, c)
@@ -49,6 +49,7 @@ func TestMEMNamespace(t *testing.T) {
 	}
 }
 
+/*
 func TestQueryNamespace(t *testing.T) {
 	url := os.Getenv("PROMURL")
 
@@ -65,3 +66,4 @@ func TestQueryNamespace(t *testing.T) {
 	}
 
 }
+*/

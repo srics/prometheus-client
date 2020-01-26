@@ -20,6 +20,7 @@ const (
 // CPUNode shall return CPU Metrics of a node
 func CPUNode(url string) (values map[string]interface{}) {
 	queryurl := url + path + "?" + "query=" + u.QueryEscape(cpuNode)
+
 	values = utils.HTTPGetReq(queryurl)
 	return values
 }
@@ -35,11 +36,11 @@ func MEMNode(url string) (values map[string]interface{}) {
 func CPUNamespace(url, namespace string) (values map[string]interface{}) {
 
 	// cpu consumption per namespace
-	// ORG QUERY: sum(rate(container_cpu_usage_seconds_total{image!='',namespace='logging'}[5m])) by (namespace)
+	// ORG QUERY: sum(rate(container_cpu_usage_seconds_total{image!='',namespace='cnox'}[5m])) /  sum (machine_cpu_cores) * 100
 	// Contruct URL to keep namespace dynamic
 
 	q := "sum(rate(container_cpu_usage_seconds_total{image!='',"
-	escapeQ := q + "namespace='" + namespace + "'}[5m]))" + "by (namespace)"
+	escapeQ := q + "namespace='" + namespace + "'}[5m]))" + "/ sum (machine_cpu_cores) * 100"
 	queryurl := url + path + "?" + "query=" + u.QueryEscape(escapeQ)
 	values = utils.HTTPGetNamespaceReq(queryurl)
 	return values
@@ -49,10 +50,10 @@ func CPUNamespace(url, namespace string) (values map[string]interface{}) {
 func MEMNamespace(url, namespace string) (values map[string]interface{}) {
 
 	// memory consumption per namespace
-	// ORG QUERY: sum(container_memory_working_set_bytes{namespace='logging'}) by (namespace)"
+	// ORG QUERY: sum(rate(container_memory_working_set_bytes{image!='',namespace='cnox'}[5m])) / sum(node_memory_MemAvailable_bytes) * 100
 	// Contruct URL to keep namespace dynamic
-	q := "sum(container_memory_working_set_bytes"
-	escapeQ := q + "{namespace='" + namespace + "'})" + "by (namespace)"
+	q := "sum(container_memory_working_set_bytes{image!='',"
+	escapeQ := q + "namespace='" + namespace + "'}[5m]))" + " / sum(node_memory_MemTotal_bytes) * 100"
 
 	queryurl := url + path + "?" + "query=" + u.QueryEscape(escapeQ)
 	values = utils.HTTPGetNamespaceReq(queryurl)
