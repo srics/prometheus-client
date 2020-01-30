@@ -1,16 +1,14 @@
 package queries
 
 import (
-	"log"
 	"os"
 	"testing"
 )
 
-func TestCPUNode(t *testing.T) {
-	url := os.Getenv("PROMURL")
+var url = os.Getenv("PROMURL")
 
+func TestCPUNode(t *testing.T) {
 	values := CPUNode(url)
-	log.Println(values)
 	for i, c := range values {
 		t.Logf("CPU Usage Values \n: Instance[%s] : Value[%s]", i, c)
 	}
@@ -21,34 +19,24 @@ func TestMEMNode(t *testing.T) {
 	url := os.Getenv("PROMURL")
 
 	values := MEMNode(url)
-	for i, c := range values {
-		t.Logf("Memory Usage Values \n: Instance[%s] : Value[%s]", i, c)
-	}
+
+	t.Logf("Memory Usage Values \n: %s", values)
+
 }
 
 func TestCPUNamespace(t *testing.T) {
 	url := os.Getenv("PROMURL")
-
-	// use any namespace as required, keep on populating
-	// this ns slice
-	ns := []string{"kube-system", "cnox"}
-
-	for _, c := range ns {
-		values := CPUNamespace(url, c)
-		t.Logf("CPU Usage Values \n: Namespace[%s] : Value[%s]", c, values)
-	}
+	values := CPUNamespace(url)
+	t.Logf("CPU Usage Values \n: : %s", values)
 
 }
 
 func TestMEMNamespace(t *testing.T) {
 	url := os.Getenv("PROMURL")
 
-	ns := []string{"kube-system", "cnox"}
+	values := CPUNamespace(url)
+	t.Logf("CPU Usage Values \n : %s", values)
 
-	for _, c := range ns {
-		values := CPUNamespace(url, c)
-		t.Logf("CPU Usage Values \n: Namespace[%s] : Value[%s]", c, values)
-	}
 }
 
 /*

@@ -6,12 +6,14 @@ import (
 	"os"
 	"prometheus/models"
 	"prometheus/queries"
+	"prometheus/utils"
 	"time"
 )
 
-// Add namespaces to this slice
-
 var url = os.Getenv("PROMURL")
+var ep = os.Getenv("ENDPOINT")
+var clusterName = os.Getenv("CLUSTERNAME")
+var customerID = os.Getenv("CUSTOMERID")
 
 func payload() {
 	var f = func(url string) (a models.Payload) {
@@ -26,6 +28,8 @@ func payload() {
 		cnoxsvc := queries.GetCnoxSvcCount(url)
 		timestamp := time.Now()
 		a = models.Payload{
+			ClusterName:  clusterName,
+			CustomerID:   customerID,
 			CnoxMem:      cnoxMem,
 			CnoxCPU:      cnoxCPU,
 			Nodes:        node,
@@ -46,7 +50,12 @@ func payload() {
 	if err != nil {
 		panic(err)
 	}
-	log.Printf("%s", b)
+
+	p, err := utils.HTTPPost(ep, b)
+	if err != nil {
+		log.Printf("%s", p.Status)
+	}
+	log.Printf("Response:[%s],Method:[%s]", p.Status, p.Request.Method)
 
 }
 

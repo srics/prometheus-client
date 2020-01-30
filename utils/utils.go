@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -92,5 +93,28 @@ func HTTPGetNodeMetric(url string) (values map[string]interface{}) {
 	}
 
 	return values
+
+}
+
+// HTTPPost to endpoint
+func HTTPPost(ep string, json []byte) (resp *http.Response, err error) {
+
+	req, err := http.NewRequest("POST", ep, bytes.NewBuffer(json))
+	req.Header.Set("Content-type", "application/json")
+	if err != nil {
+		log.Fatalf("NewRequest construct error : %d", err)
+	}
+
+	req.SetBasicAuth(os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
+
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatalf("POST request error on URL specified : %s", err)
+
+	}
+
+	defer resp.Body.Close()
+
+	return resp, err
 
 }

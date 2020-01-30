@@ -1,0 +1,26 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: metrics
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 0
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: metrics
+            image: singh1234/prometheus:v1
+            env:
+            - name: PROMURL
+              value: ""
+            - name: ENDPOINT
+              value: ""
+            - name: CLUSTERNAME
+              value: ""
+            - name: CUSTOMERID
+              value: ""
+          restartPolicy: OnFailure

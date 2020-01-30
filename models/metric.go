@@ -42,9 +42,10 @@ type Payload struct {
 	Pods            interface{}     `json:"pods"`
 	Services        interface{}     `json:"services"`
 	Timestamp       time.Time       `json:"timestamp"`
-	NodeSummaryJSON NodeSummaryJSON `json:"nodeSummaryJSON"`
+	NodeSummaryJSON NodeSummaryJSON `json:"node_summary_json"`
 }
 
+// NodeSummaryJSON represents a node object
 type NodeSummaryJSON struct {
 	CPU map[string]interface{} `json:"cpu"`
 	Mem interface{}            `json:"mem"`
