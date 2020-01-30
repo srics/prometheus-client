@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"log"
 	"os"
 	"testing"
 )
@@ -9,6 +10,7 @@ func TestCPUNode(t *testing.T) {
 	url := os.Getenv("PROMURL")
 
 	values := CPUNode(url)
+	log.Println(values)
 	for i, c := range values {
 		t.Logf("CPU Usage Values \n: Instance[%s] : Value[%s]", i, c)
 	}
@@ -29,7 +31,7 @@ func TestCPUNamespace(t *testing.T) {
 
 	// use any namespace as required, keep on populating
 	// this ns slice
-	ns := []string{"kube-system", "logging"}
+	ns := []string{"kube-system", "cnox"}
 
 	for _, c := range ns {
 		values := CPUNamespace(url, c)
@@ -48,6 +50,17 @@ func TestMEMNamespace(t *testing.T) {
 		t.Logf("CPU Usage Values \n: Namespace[%s] : Value[%s]", c, values)
 	}
 }
+
+/*
+func TestGetNodeCount(t *testing.T) {
+	url := os.Getenv("PROMURL")
+	values := GetNodeCount(url)
+
+	for _, c := range values {
+		t.Logf("Node Count [%s]", c)
+	}
+}
+*/
 
 /*
 func TestQueryNamespace(t *testing.T) {
