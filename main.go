@@ -50,6 +50,7 @@ func payload() {
 	if err != nil {
 		panic(err)
 	}
+	log.Printf("%s", b)
 
 	p, err := utils.HTTPPost(ep, b)
 	if err != nil {
