@@ -2,11 +2,16 @@ package utils
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/pkg/errors"
+
 	"prometheus/models"
 )
 
@@ -14,6 +19,24 @@ var (
 	generic models.GenericMetric
 	node    models.NodeMetric
 )
+
+func getHTTPClient(cloudSaaSCertBundle string) (*http.Client, error) {
+	var transport http.Transport
+	if cloudSaaSCertBundle != "" {
+		cert, err := ioutil.ReadFile(cloudSaaSCertBundle)
+		if err != nil {
+			return nil, errors.Wrapf(err, "Reading api-server tls cert bundle")
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(cert)
+		transport.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+	}
+	client := http.Client{
+		Transport: &transport,
+	}
+
+	return &client, nil
+}
 
 // HTTPGetMetric returns metric value
 func HTTPGetMetric(url string) (values interface{}) {
@@ -97,8 +120,12 @@ func HTTPGetNodeMetric(url string) (values map[string]interface{}) {
 }
 
 // HTTPPost to endpoint
-func HTTPPost(ep string, json []byte) (resp *http.Response, err error) {
+func HTTPPost(ep string, cloudSaaSCertBundle string, json []byte) (resp *http.Response, err error) {
 
+	client, err := getHTTPClient(cloudSaaSCertBundle)
+	if err != nil {
+		log.Fatalf("getHTTPClient error : %s", err)
+	}
 	req, err := http.NewRequest("POST", ep, bytes.NewBuffer(json))
 	req.Header.Set("Content-type", "application/json")
 	if err != nil {
@@ -107,7 +134,7 @@ func HTTPPost(ep string, json []byte) (resp *http.Response, err error) {
 
 	req.SetBasicAuth(os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
 
-	resp, err = http.DefaultClient.Do(req)
+	resp, err = client.Do(req)
 	if err != nil {
 		log.Fatalf("POST request error on URL specified : %s", err)
 

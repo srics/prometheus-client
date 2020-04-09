@@ -15,6 +15,10 @@ var ep = os.Getenv("ENDPOINT")
 var clusterName = os.Getenv("CLUSTERNAME")
 var customerID = os.Getenv("CUSTOMERID")
 
+const (
+	cloudSaaSCertBundleFile = "/etc/ssl/certs/bundle.crt"
+)
+
 func payload() {
 	var f = func(url string) (a models.Payload) {
 		cnoxMem := queries.MEMNamespace(url)
@@ -52,11 +56,16 @@ func payload() {
 	}
 	log.Printf("%s", b)
 
-	p, err := utils.HTTPPost(ep, b)
-	if err != nil {
-		log.Printf("%s", p.Status)
+	var certBundle string
+	if _, err := os.Stat(cloudSaaSCertBundleFile); err == nil {
+		certBundle = cloudSaaSCertBundleFile
 	}
-	log.Printf("Response:[%s],Method:[%s]", p.Status, p.Request.Method)
+
+	p, err := utils.HTTPPost(ep, certBundle, b)
+	if err != nil {
+		log.Printf("Endpoing %s, %s", ep, p.Status)
+	}
+	log.Printf("Endpoint %s, Response:[%s],Method:[%s]", ep, p.Status, p.Request.Method)
 
 }
 
