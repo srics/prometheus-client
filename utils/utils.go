@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -20,7 +21,10 @@ var (
 	node    models.NodeMetric
 )
 
-func getHTTPClient(cloudSaaSCertBundle string) (*http.Client, error) {
+/*
+ * http client connection to CNOX SaaS Cloud
+ */
+func getCNOXSaaSClient(cloudSaaSCertBundle string) (*http.Client, error) {
 	var transport http.Transport
 	if cloudSaaSCertBundle != "" {
 		cert, err := ioutil.ReadFile(cloudSaaSCertBundle)
@@ -33,14 +37,26 @@ func getHTTPClient(cloudSaaSCertBundle string) (*http.Client, error) {
 	}
 	client := http.Client{
 		Transport: &transport,
+		Timeout: time.Second * 120,
 	}
 
 	return &client, nil
 }
 
+/*
+ * http client connection to prometheus
+ */
+func getPromHTTPClient() (*http.Client) {
+	client := http.Client{
+		Timeout: time.Second * 120,
+	}
+	return &client
+}
+
 // HTTPGetMetric returns metric value
 func HTTPGetMetric(url string) (values interface{}) {
 
+	client := getPromHTTPClient()
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatalf("NewRequest construct error : %d", err)
@@ -48,7 +64,7 @@ func HTTPGetMetric(url string) (values interface{}) {
 
 	req.SetBasicAuth(os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("GET request error on URL specified : %d", err)
 
@@ -81,6 +97,7 @@ func HTTPGetMetric(url string) (values interface{}) {
 
 func HTTPGetNodeMetric(url string) (values map[string]interface{}) {
 
+	client := getPromHTTPClient()
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatalf("NewRequest construct error : %d", err)
@@ -88,7 +105,7 @@ func HTTPGetNodeMetric(url string) (values map[string]interface{}) {
 
 	req.SetBasicAuth(os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("GET request error on URL specified : %d", err)
 
@@ -122,9 +139,9 @@ func HTTPGetNodeMetric(url string) (values map[string]interface{}) {
 // HTTPPost to endpoint
 func HTTPPost(ep string, cloudSaaSCertBundle string, json []byte) (resp *http.Response, err error) {
 
-	client, err := getHTTPClient(cloudSaaSCertBundle)
+	client, err := getCNOXSaaSClient(cloudSaaSCertBundle)
 	if err != nil {
-		log.Fatalf("getHTTPClient error : %s", err)
+		log.Fatalf("getCNOXSaaSClient error : %s", err)
 	}
 	req, err := http.NewRequest("POST", ep, bytes.NewBuffer(json))
 	req.Header.Set("Content-type", "application/json")
